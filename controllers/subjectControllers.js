@@ -6,13 +6,16 @@ const Subject = require('../models/Subject');
 const Group = require('../models/Group');
 const subjectValidation = require('../config/joi/subjectValidation');
 
+
+
 exports.postCreate = (req,res) => {
   // validate the subject-name & group-name
   // this route accepts a form of 'name' and makes a new subject, and a group for it
-  const {error,value} = Joi.validate(req.body,subjectValidation.createSubjectValidationSchema);
-  if(error) {
-    res.status(400).send(error.details[0].message);
-  } else {
+  const {error,value} = Joi.validate(req.body,subjectValidation.creationSchema);
+  if(error) res.status(400).send(error.details[0].message);
+  // if Input Validation Successful:
+  else {
+    value.name = value.name.trim();
     // Create a new group first and save it
     const newGroup = new Group({name:value.name + " Group",memberCount:0,posts:[]});
     newGroup.save()
@@ -34,11 +37,13 @@ exports.postCreate = (req,res) => {
   }
 };// end route
 
-exports.postUpdateTitle = (req,res) => {
-  const {error,value} = Joi.validate(req.body,subjectValidation.updateSubjectNameValidationSchema);
-  if(error) {
-    res.status(400).send(error.details[0].message);
-  } else {
+exports.postUpdate = (req,res) => {
+  const {error,value} = Joi.validate(req.body,subjectValidation.updationSchema);
+  if(error) res.status(400).send(error.details[0].message);
+  // if Input Validation Successful:
+  else {
+    value.oldName = value.oldName.trim();
+    value.newName = value.newName.trim();
     Subject.findOne({name:value.oldName})
     .then(subject => {
       if(!subject) res.status(400).send("No subject found");
@@ -47,14 +52,13 @@ exports.postUpdateTitle = (req,res) => {
         Group.findById(subject.group)
         .then(group => {
           if(!group) res.status(500).send("Operation Failed Internally");
-          // if group found
+          // if group found:
           else {
             subject.name = value.newName;
             group.name = value.newName + " Group";
             subject.save()
             .then(()=> {
               group.save()
-              // finish response
               .then(()=> {
                 return res.send("Name Changed Successfully")
               })
@@ -75,5 +79,30 @@ exports.postUpdateTitle = (req,res) => {
     .catch(err=>{
       return res.send("Error. Consult an adminstrator");
     });
+  }
+};// end route
+
+exports.deleteDelete = (req,res) => {
+  const {error,value} = Joi.validate(req.body,subjectValidation.creationSchema);
+  if(error) res.status(400).send(error.details[0].message);
+  // if Input Validation Successful:
+  else {
+    value.name = value.name.trim();
+    // if Validation Successful:
+    Group.deleteOne({name:value.name + " Group"}).exec()
+    .then(groupDeletion=> {
+      if(groupDeletion.deletedCount === 0) return res.status(400).send("No Subject (group) with that name");
+      // if group deleted:
+      else {
+        Subject.deleteOne({name:value.name}).exec()
+        .then(result=> {
+          if(result.deletedCount === 0) {
+            return res.status(400).send("No Subject (group) with that name");
+          } else {
+            return res.send("Subject Deleted");
+          }
+        });// end subject .then()
+      }
+    });// end group .then()
   }
 };// end route

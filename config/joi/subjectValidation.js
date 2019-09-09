@@ -1,10 +1,10 @@
 const Joi = require('@hapi/joi');
 
-exports.createSubjectValidationSchema = {
+exports.creationSchema = {
   name:Joi.string().min(2).max(60).required(),
 };
 
-exports.updateSubjectNameValidationSchema = {
+exports.updationSchema = {
   oldName:Joi.string().min(2).max(60).required(),
   newName:Joi.string().min(2).max(60).required()
 };
