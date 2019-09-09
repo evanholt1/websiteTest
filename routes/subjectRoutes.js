@@ -3,6 +3,10 @@ const router = express.Router();
 
 const subjectControllers = require('../controllers/subjectControllers');
 
+// @route GET /subjects/
+// @desc  shows all subjects in the college
+router.get('/',subjectControllers.getRoot);
+
 // @route POST /subjects/create
 // @desc  creates a new subject & a group for it
 router.post('/create',subjectControllers.postCreate);

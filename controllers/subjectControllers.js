@@ -6,7 +6,28 @@ const Subject = require('../models/Subject');
 const Group = require('../models/Group');
 const subjectValidation = require('../config/joi/subjectValidation');
 
-
+exports.getRoot = (req,res) => {
+  Subject.find().exec()
+  .then(subjectArray => {
+    if(!subjectArray) return res.send("No Subjects are available.");
+    // if subjects are found & returned :
+    else {
+      Group.find().exec()
+      .then(groupArray => {
+        if(!groupArray) return res.send("No Groups are available.");
+        // if groups are found & returned :
+        else {
+          if(subjectArray.length !== groupArray.length) return res.status(500).send("Server Matching Error");
+          else {
+            for(let i =0;i<subjectArray.length;i++) 
+              res.write(subjectArray[i].name + " || "+groupArray[i].name+"\n");
+            return res.end();
+          }
+        }
+      });// group .then()
+    }
+  });//subject .then()
+};//end route
 
 exports.postCreate = (req,res) => {
   // validate the subject-name & group-name
