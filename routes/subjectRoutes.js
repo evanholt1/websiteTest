@@ -11,7 +11,7 @@ router.get('/',subjectControllers.getRoot);
 // @desc  creates a new subject & a group for it
 router.post('/create',subjectControllers.postCreate);
 
-// @route POST /subjects/updateTitle
+// @route POST /subjects/update
 // @desc  updates the title of a subject & its group
 router.post('/update',subjectControllers.postUpdate);
 

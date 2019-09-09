@@ -8,7 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 // File imports
 const userRouter = require('./routes/userRoutes');
 const subjectRouter = require('./routes/subjectRoutes');
-// const groupRouter = require('./routes/groupRoutes');
+ const groupRouter = require('./routes/groupRoutes');
 // const postRouter = require('./routes/postRoutes');
 
 mongoose.connect(process.env.MONGO_CONNECTION,{useNewUrlParser:true});
@@ -36,8 +36,8 @@ app.use(session({
 
 app.use('/users',userRouter);
 app.use('/subjects',subjectRouter);
+ app.use('/groups',groupRouter);
 // app.use('/posts',postRouter);
-// app.use('/groups',groupRouter);
 
 const PORT = process.env.PORT || 5000;
 
