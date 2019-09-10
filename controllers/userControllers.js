@@ -40,7 +40,7 @@ exports.postLogin = (req,res) => {
 
 exports.postLogout = (req,res) => {
   if(!req.session.userID) {
-    res.status(401).redirect('/login');
+    res.status(401).send('Not logged in');
   } else {
     User.findOne(req.session.userID,{},{ runValidators: true, context: 'query' })
     .then(user => {

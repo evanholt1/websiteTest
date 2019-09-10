@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
+var back = require('express-back');
 
 // File imports
 const userRouter = require('./routes/userRoutes');
@@ -13,6 +14,7 @@ const subjectRouter = require('./routes/subjectRoutes');
 
 mongoose.connect(process.env.MONGO_CONNECTION,{useNewUrlParser:true});
 mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 
 const app = express();
 
@@ -34,6 +36,7 @@ app.use(session({
   }
 }));
 
+app.use(back());
 app.use('/users',userRouter);
 app.use('/subjects',subjectRouter);
  app.use('/groups',groupRouter);
