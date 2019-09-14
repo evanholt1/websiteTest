@@ -9,8 +9,8 @@ var back = require('express-back');
 // File imports
 const userRouter = require('./routes/userRoutes');
 const subjectRouter = require('./routes/subjectRoutes');
- const groupRouter = require('./routes/groupRoutes');
-// const postRouter = require('./routes/postRoutes');
+const groupRouter = require('./routes/groupRoutes');
+const notFoundRouter = require('./routes/notFoundRoute');
 
 mongoose.connect(process.env.MONGO_CONNECTION,{useNewUrlParser:true});
 mongoose.set('useCreateIndex', true);
@@ -39,8 +39,8 @@ app.use(session({
 app.use(back());
 app.use('/users',userRouter);
 app.use('/subjects',subjectRouter);
- app.use('/groups',groupRouter);
-// app.use('/posts',postRouter);
+app.use('/groups',groupRouter);
+app.use(notFoundRouter);
 
 const PORT = process.env.PORT || 5000;
 
