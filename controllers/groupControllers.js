@@ -5,8 +5,7 @@ const User = require('../models/User');
 
 exports.getRoot = (req,res)=> {
   //req.params.name = req.params.name.replace("Group","").trim();
-  console.log(req.params.name + " "+req.params.name.length);
-  Group.findOne({name:req.params.name+" Group"}).exec()
+  Group.findOne({name:req.params.name+" Group"}).populate('posts').exec()
   .then(group=> {
     if(!group) return res.status(404).send("Page not found");
     else {
@@ -16,6 +15,7 @@ exports.getRoot = (req,res)=> {
 };// end route
 
 exports.postNewPost = (req,res) => {
+  
   let groupName = req.prevPath;
   groupName = groupName.replace("/groups/","") + " Group";
   Group.findOne({name:groupName}).exec()
@@ -41,9 +41,23 @@ exports.postNewPost = (req,res) => {
   
 };//end route
 
-exports.postUpdatePost = (req,res) => {
-  user_id === post.author
-  User.findById
+exports.putUpdatePost = (req,res) => {
+  //req.body.postID is a hidden input field, dynamically generated when making posts in the front-end. it stores ObjectID
+  Post.findById(req.body.postID)
+  .exec()
+  .then(post => {
+    // check if a post with that ID doesn't exist
+    if(!post) res.status(403).send("Not Logged In");
+    else {
+      // check if the user modifying is not the one who made the post
+      if(req.session.userID.toString() !== post.author.toString()) res.status(403).send("Not Appropriate User");
+      else {
+        post.text = req.body.text;
+        post.save()
+        .then(res.send("Post Updated"));
+      }
+    }
+  }) ;
 }//end route
 
 exports.deleteDeletePost = (req,res) => {
